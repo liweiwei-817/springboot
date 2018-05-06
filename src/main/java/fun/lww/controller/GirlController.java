@@ -1,8 +1,12 @@
 package fun.lww.controller;
 
 import fun.lww.entity.Girl;
+import fun.lww.entity.Result;
+import fun.lww.enums.ResultEnum;
+import fun.lww.exception.GirlException;
 import fun.lww.repository.GirlRepository;
 import fun.lww.service.GirlService;
+import fun.lww.utils.ResultUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,13 +40,12 @@ public class GirlController {
         return girlRepository.save(girl);
     }*/
     @PostMapping("/add")
-    public Girl girlAdd(@Valid Girl g,  BindingResult bindingResult) {
+    public Result<Girl> girlAdd(@Valid Girl girl, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            logger.info(bindingResult.getFieldError().getDefaultMessage());
-            return null;
+            return ResultUtil.error(0, bindingResult.getFieldError().getDefaultMessage());
         }
-        Girl girl = new Girl(g.getCupSize(), g.getAge());
-        return girlRepository.save(girl);
+        girlRepository.save(girl);
+        return ResultUtil.success(girl);
     }
 
     @GetMapping("/sel/{id}")
@@ -68,5 +71,10 @@ public class GirlController {
     @PostMapping("/addTwo")
     public void girlInsertTwo() {
         girlService.insertGirl();
+    }
+
+    @GetMapping("/getAge/{id}")
+    public void getAge(@PathVariable Integer id) throws GirlException {
+        girlService.findAge(id);
     }
 }
